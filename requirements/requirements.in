@@ -5,3 +5,4 @@ langchain
 langchain-openai
 tiktoken
 pypdf
+guidance

@@ -18,6 +18,7 @@ anyio==4.3.0
     #   jupyter-server
     #   langchain-core
     #   openai
+    #   starlette
 appnope==0.1.4
     # via ipykernel
 argon2-cffi==23.1.0
@@ -54,6 +55,8 @@ cffi==1.16.0
     # via argon2-cffi-bindings
 charset-normalizer==3.3.2
     # via requests
+click==8.1.7
+    # via uvicorn
 comm==0.2.2
     # via
     #   ipykernel
@@ -68,6 +71,8 @@ decorator==5.1.1
     # via ipython
 defusedxml==0.7.1
     # via nbconvert
+diskcache==5.6.3
+    # via guidance
 distro==1.9.0
     # via openai
 exceptiongroup==1.2.0
@@ -76,6 +81,8 @@ exceptiongroup==1.2.0
     #   ipython
 executing==2.0.1
     # via stack-data
+fastapi==0.110.0
+    # via guidance
 fastjsonschema==2.19.1
     # via nbformat
 fqdn==1.5.1
@@ -84,8 +91,12 @@ frozenlist==1.4.1
     # via
     #   aiohttp
     #   aiosignal
+guidance==0.1.13
+    # via -r ./requirements/requirements.in
 h11==0.14.0
-    # via httpcore
+    # via
+    #   httpcore
+    #   uvicorn
 httpcore==1.0.4
     # via httpx
 httpx==0.27.0
@@ -235,6 +246,8 @@ nbformat==5.10.3
     #   nbconvert
 nest-asyncio==1.6.0
     # via ipykernel
+networkx==3.2.1
+    # via pyformlang
 notebook==7.1.2
     # via jupyter
 notebook-shim==0.2.4
@@ -243,12 +256,17 @@ notebook-shim==0.2.4
     #   notebook
 numpy==1.26.4
     # via
+    #   guidance
     #   langchain
     #   langchain-community
+    #   pyformlang
 openai==1.14.2
     # via
     #   -r ./requirements/requirements.in
+    #   guidance
     #   langchain-openai
+ordered-set==4.1.0
+    # via guidance
 orjson==3.9.15
     # via langsmith
 overrides==7.7.0
@@ -271,13 +289,17 @@ parso==0.8.3
 pexpect==4.9.0
     # via ipython
 platformdirs==4.2.0
-    # via jupyter-core
+    # via
+    #   guidance
+    #   jupyter-core
 prometheus-client==0.20.0
     # via jupyter-server
 prompt-toolkit==3.0.43
     # via
     #   ipython
     #   jupyter-console
+protobuf==5.26.0
+    # via guidance
 psutil==5.9.8
     # via ipykernel
 ptyprocess==0.7.0
@@ -290,18 +312,25 @@ pycparser==2.21
     # via cffi
 pydantic==2.6.4
     # via
+    #   fastapi
     #   langchain
     #   langchain-core
     #   langsmith
     #   openai
 pydantic-core==2.16.3
     # via pydantic
+pydot==2.0.0
+    # via pyformlang
+pyformlang==1.0.9
+    # via guidance
 pygments==2.17.2
     # via
     #   ipython
     #   jupyter-console
     #   nbconvert
     #   qtconsole
+pyparsing==3.1.2
+    # via pydot
 pypdf==4.1.0
     # via -r ./requirements/requirements.in
 python-dateutil==2.9.0.post0
@@ -336,6 +365,7 @@ regex==2023.12.25
     # via tiktoken
 requests==2.31.0
     # via
+    #   guidance
     #   jupyterlab-server
     #   langchain
     #   langchain-community
@@ -375,6 +405,8 @@ sqlalchemy==2.0.28
     #   langchain-community
 stack-data==0.6.3
     # via ipython
+starlette==0.36.3
+    # via fastapi
 tenacity==8.2.3
     # via
     #   langchain
@@ -387,6 +419,7 @@ terminado==0.18.1
 tiktoken==0.6.0
     # via
     #   -r ./requirements/requirements.in
+    #   guidance
     #   langchain-openai
 tinycss2==1.2.1
     # via nbconvert
@@ -425,17 +458,21 @@ typing-extensions==4.10.0
     # via
     #   anyio
     #   async-lru
+    #   fastapi
     #   openai
     #   pydantic
     #   pydantic-core
     #   sqlalchemy
     #   typing-inspect
+    #   uvicorn
 typing-inspect==0.9.0
     # via dataclasses-json
 uri-template==1.3.0
     # via jsonschema
 urllib3==2.2.1
     # via requests
+uvicorn==0.29.0
+    # via guidance
 wcwidth==0.2.13
     # via prompt-toolkit
 webcolors==1.13
