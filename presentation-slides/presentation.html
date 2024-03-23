@@ -24,15 +24,15 @@
         # Table of Contents
         ## Modules
         
-        1. Introduction to Prompt Engineering 
+        __1. Introduction to Prompt Engineering __
 
         --
 
-        2. Prompt Engineering Techniques
+        __2. Prompt Engineering Techniques__
 
         --
 
-        3. Prompt Engineering Experiments
+        __3. Prompt Engineering Experiments__
 
         ---
         class: center, middle
@@ -362,7 +362,7 @@
         
         ---
 
-        # Q&A & Summary
+        # Summary
 
           - __Prompt Engineering__ is the discipline for engineering prompts
 
@@ -408,10 +408,12 @@
         - One can use this as the first try at a model to see what kind of tasks LLM can already solve out of the box
 
         --
-
-        - Classify the sentiment in this sentence as negative or positive: 
-        Text: I will go to a vacation. 
-        Sentiment:
+ 
+        - <span style="background-color: yellow">
+          _          Classify the sentiment in this sentence as negative or positive: 
+          Text: I will go to a vacation. 
+          Sentiment:_
+        </span>
 
         ---
 
@@ -423,9 +425,14 @@
 
         --
 
-        - A "whatpu" is a small, furry animal native to Tanzania. 
-        An example of a sentence that uses the word whatpu is: We were traveling in Africa and we saw these very cute whatpus. 
-        To do a "farduddle" means to jump up and down really fast. An example of a sentence that uses the word farduddle is: 
+        - <span style="background-color: yellow">
+            Translate from English to French:</span>
+
+            <span style="background-color: yellow"> - I am a student --> Je suis un étudiant</span>
+
+            <span style="background-color: yellow">- I am a teacher --> Je suis un professeur</span>
+
+            <span style="background-color: yellow"> - I am a doctor --> </span>
 
         --
 
@@ -437,15 +444,25 @@
 
         --
 
-        - Chain-of-thought (CoT) enables complex reasoning capabilities through intermediate reasoning steps (Wei et al. 2022).
+        - Chain-of-thought (CoT) enables complex reasoning capabilities through intermediate reasoning steps (Wei et al. 2022).
 
         --
 
-        - Q: I have one sister and one brother. I am 20 years of age. My sister is 5 years older and my brother 2 years younger than my sister. How old is my brother? 
+          <span style="background-color: yellow">
+            Q: I have one sister and one brother. I am 20 years of age. My sister is 5 years older and my brother 2 years younger than my sister. How old is my brother? 
+          </span>
 
-        - A: If I am 20 years of age and my sister is 5 years older, my sister is 20+5=25 years old. If my brother is 2 years younger than my sister, my brother is 25-2=23 years old. The answer is 23 years old. 
-        
-        - Q: I have 2 friends, Jack and Sally. Jack is 2 years older than Sally. Sally is 5 years younger than me. I am 17 years old. How old is Jack? 
+        --
+
+          <span style="background-color: yellow">
+            A: If I am 20 years of age and my sister is 5 years older, my sister is 20+5=25 years old. If my brother is 2 years younger than my sister, my brother is 25-2=23 years old. The answer is 23 years old. 
+          </span>
+
+        --
+          
+          <span style="background-color: yellow">
+            Q: I have 2 friends, Jack and Sally. Jack is 2 years older than Sally. Sally is 5 years younger than me. I am 17 years old. How old is Jack?
+          </span>
 
         ---
 
@@ -486,6 +503,21 @@
           - Step Back Prompting (Zheng et al. 2023)
         
         ---
+        # Summary
+
+        - Zero-shot prompting: solve tasks without examples
+
+        - Few-shot prompting: show a few examples of what a solution might look like
+
+        - Chain-of-Thought: enables complex reasoning capabilities through intermediate reasoning steps
+
+        - Self-Consistency: ensures that the model's outputs are consistent with the input
+
+        - Knowledge Generation: generating facts related to the question
+
+        - There are many more prompt engineering techniques that grow in complexity
+        
+        ---
         class: center, middle
 
         # Module #3
@@ -494,27 +526,199 @@
 
         ---
         # Designing Prompt Engineering Experiments
-        
-        ---
-        # Evaluation Metrics in Prompt Engineering
-        
-        ---
-        # Text Summarization Use Case
-        
-        ---
-        # Code Generation Use Case
-        
-        ---
-        # Q&A - Prompting to Understand Papers
-        
-        ---
-        # Designing Prompt Engineering Workflow
-        
-        ---
-        # Prompt Engineering Experiments
 
-        
+        --
 
+        ## Evolving the Prompt Engineering Template
+
+        - Task, metric, candidates, experiment, iterate
+
+        --
+
+        - **Systematic approach**
+
+          - Task specification strategies
+
+        --
+
+          - Strategies for defining metrics
+        
+        --
+
+          - Strategies for prompt candidates generation
+
+        --
+
+          - Strategies for experimentation
+
+
+        ---
+        # Task Specification Strategies
+
+        - Writing prompts constrains continuation to task completion
+
+        --
+
+        - Few-shot and 0-shot: key jargon in prompt programming
+
+        --
+
+        - 0-shot prompts split into direct and proxy specifications
+
+        --
+
+        - **Direct**: Tells the model to perform a known task or construct a task from known components
+
+        --
+
+        - Signifiers in direct specification key intended behavior without explicit instruction
+
+        --
+
+        - **By proxy**: Uses analogies or characters as proxies for complex or nuanced intentions
+
+        --
+
+        - Specification by proxy keys behaviors from cultural consciousness rather than direct naming
+
+        --
+
+        - **By demonstration (n-shot)**: Effective for tasks requiring specific formats or instructive examples
+
+        --
+
+        - Constraining behavior to guide models towards intended continuations and avoid ambiguity
+
+        ---
+        # Strategies for defining metrics 
+        
+        --
+
+        - __Clear objective__
+
+        --
+
+          - Understand and define the task unambiguously
+
+        --
+
+        - __Specify criteria__
+          
+        --
+
+          - Relevance, creativity, accuracy, fluency, coherence, etc.
+
+        --
+
+        - __Measurable outcomes__
+
+        --
+
+          - Progress should be clearly measurable
+
+        --
+
+        - __Systematic evaluation__
+
+        --
+
+          - Review Relevant Metrics: BLEU, ROUGE, METEOR, etc.
+
+        --
+
+          - Task-Specific
+        
+        --
+
+          - Automated evaluation
+
+        --
+
+        - __Iterative feedback!__
+
+        ---
+        # Strategies for prompt candidates generation
+
+        --
+
+        - __Field expertise + effective prompt generation strategies__
+
+        --
+
+          - Meta prompts
+
+        --
+
+          - Prompt templates
+
+        --
+
+          - Tooling: guidance, langchain, lmql, dspy, marvin, outlines, etc.
+          
+        --
+
+          - It's not about the tool!
+
+        --
+
+          - It's about design patterns and best practices!
+
+        ---
+        # Strategies for experimentation
+
+        --
+
+        - __LLM specificity, domain knowledge, and iteration__
+
+        --
+
+        - __Trial and error with measurable outcomes__
+
+        --
+
+        - __Systematic evaluation + iterative feedback__ 
+
+        ---
+        class: center, middle 
+        
+        <h1><span style="background-color: lightgreen">
+            Demo - Text Summarization Use Case
+        </span></h1>
+        
+        ---
+        class: center, middle 
+        
+        <h1><span style="background-color: lightgreen">
+          Demo - Code Generation Use Case
+        </span></h1>
+        
+        ---
+        class: center, middle 
+        
+        <h1><span style="background-color: lightgreen">
+          Demo - Q&A - Prompting to Understand Papers
+        </span></h1>
+        
+        ---
+        class: center, middle 
+
+        <h1><span style="background-color: lightgreen">
+          Demo - Designing Prompt Engineering Workflow
+        </span></h1>
+
+        ---
+        # Summary
+
+        - Evolving the Prompt Engineering Template
+
+        - Task specification strategies
+
+        - Strategies for defining metrics
+
+        - Strategies for prompt candidates generation
+
+        - Strategies for experimentation
+        
 
 
     </textarea>
