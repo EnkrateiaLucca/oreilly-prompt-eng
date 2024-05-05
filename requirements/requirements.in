@@ -5,3 +5,7 @@ langchain-openai
 tiktoken
 pypdf
 guidance
+instructor
+pydantic
+anthropic
+jinja2

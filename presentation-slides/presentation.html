@@ -560,9 +560,25 @@
 
         - Writing prompts constrains continuation to task completion
 
+        ???
+        
+        So, when you write a prompt, you are not just asking the model to perform a task, 
+        but also defining how narrowly or broadly the model should interpret and respond 
+        to that task. Effective prompting is about finding the right balance between giving 
+        enough guidance to achieve the desired outcome without over-constraining the model, 
+        which might limit its ability to generate creative or comprehensive responses.
+
         --
 
         - Few-shot and 0-shot: key jargon in prompt programming
+
+        ???
+
+        2 basic ways to prompt the model
+        0-shot prompts split into direct and proxy specifications
+        "In zero-shot learning, we can further categorize our prompts into two types: direct and proxy.
+        Direct prompts explicitly tell the model what to do, while proxy prompts guide the model more subtly,
+        using analogies or indirect references."
 
         --
 
@@ -572,10 +588,15 @@
 
         - **Direct**: Tells the model to perform a known task or construct a task from known components
 
+        ???
+        "When we use a direct prompt, we are clearly defining what the model should do. For example, a direct prompt might be 'Summarize the article above.' Here, the model is explicitly instructed and knows the components of the task – it involves reading and summarizing.""Even within direct prompts, we use certain keywords or signifiers that hint at the expected behavior without laying out every detail. For instance, using the word 'summarize' already implies condensing information, focusing on key points, and omitting less important details."
+
         --
 
         - Signifiers in direct specification key intended behavior without explicit instruction
 
+        ???
+        "Proxy prompts use analogies or fictional characters to set the task. For example, asking 'How would Einstein approach this physics problem?' leverages our cultural understanding of Einstein as a proxy for analytical and innovative thinking."
         --
 
         - **By proxy**: Uses analogies or characters as proxies for complex or nuanced intentions
@@ -584,13 +605,24 @@
 
         - Specification by proxy keys behaviors from cultural consciousness rather than direct naming
 
+        ???
+        "This approach—specification by proxy—relies on shared cultural knowledge to guide the model's response, rather than straightforward commands. It draws on commonly understood symbols and figures, tapping into a deeper, sometimes more nuanced reservoir of context and expectations."
+
         --
 
         - **By demonstration (n-shot)**: Effective for tasks requiring specific formats or instructive examples
 
+        ???
+        "When we move to n-shot, or by demonstration, we provide multiple examples to show exactly how a task should be performed. This is particularly useful for tasks that require adherence to specific formats or styles, where examples serve as a clear template for the model to follow."
+
         --
 
         - Constraining behavior to guide models towards intended continuations and avoid ambiguity
+
+        ???
+        "Finally, the concept of constraining behavior is about carefully crafting our prompts to channel the model's responses in a specific direction. This helps prevent the model from veering off course or producing ambiguous outputs. It's about being clear and precise in our instructions to get the most relevant and accurate responses."
+
+        
 
         ---
         # Strategies for defining metrics 

@@ -2,14 +2,17 @@
 #    uv pip compile ./requirements/requirements.in -o ./requirements/requirements.txt
 aiohttp==3.9.3
     # via
+    #   instructor
     #   langchain
     #   langchain-community
 aiosignal==1.3.1
     # via aiohttp
 annotated-types==0.6.0
     # via pydantic
+anthropic==0.25.7
 anyio==4.3.0
     # via
+    #   anthropic
     #   httpx
     #   langchain-core
     #   openai
@@ -32,7 +35,9 @@ certifi==2024.2.2
 charset-normalizer==3.3.2
     # via requests
 click==8.1.7
-    # via uvicorn
+    # via
+    #   typer
+    #   uvicorn
 comm==0.2.2
     # via ipykernel
 dataclasses-json==0.6.4
@@ -46,7 +51,11 @@ decorator==5.1.1
 diskcache==5.6.3
     # via guidance
 distro==1.9.0
-    # via openai
+    # via
+    #   anthropic
+    #   openai
+docstring-parser==0.16
+    # via instructor
 exceptiongroup==1.2.0
     # via
     #   anyio
@@ -55,10 +64,14 @@ executing==2.0.1
     # via stack-data
 fastapi==0.110.0
     # via guidance
+filelock==3.14.0
+    # via huggingface-hub
 frozenlist==1.4.1
     # via
     #   aiohttp
     #   aiosignal
+fsspec==2024.3.1
+    # via huggingface-hub
 guidance==0.1.13
 h11==0.14.0
     # via
@@ -67,18 +80,24 @@ h11==0.14.0
 httpcore==1.0.4
     # via httpx
 httpx==0.27.0
-    # via openai
+    # via
+    #   anthropic
+    #   openai
+huggingface-hub==0.22.2
+    # via tokenizers
 idna==3.6
     # via
     #   anyio
     #   httpx
     #   requests
     #   yarl
+instructor==1.2.5
 ipykernel==6.29.3
 ipython==8.22.2
     # via ipykernel
 jedi==0.19.1
     # via ipython
+jinja2==3.1.3
 jsonpatch==1.33
     # via
     #   langchain
@@ -108,12 +127,18 @@ langsmith==0.1.31
     #   langchain
     #   langchain-community
     #   langchain-core
+markdown-it-py==3.0.0
+    # via rich
+markupsafe==2.1.5
+    # via jinja2
 marshmallow==3.21.1
     # via dataclasses-json
 matplotlib-inline==0.1.6
     # via
     #   ipykernel
     #   ipython
+mdurl==0.1.2
+    # via markdown-it-py
 multidict==6.0.5
     # via
     #   aiohttp
@@ -133,6 +158,7 @@ numpy==1.26.4
 openai==1.14.2
     # via
     #   guidance
+    #   instructor
     #   langchain-openai
 ordered-set==4.1.0
     # via guidance
@@ -140,6 +166,7 @@ orjson==3.9.15
     # via langsmith
 packaging==23.2
     # via
+    #   huggingface-hub
     #   ipykernel
     #   langchain-core
     #   marshmallow
@@ -161,21 +188,27 @@ ptyprocess==0.7.0
     # via pexpect
 pure-eval==0.2.2
     # via stack-data
-pydantic==2.6.4
+pydantic==2.7.1
     # via
+    #   anthropic
     #   fastapi
+    #   instructor
     #   langchain
     #   langchain-core
     #   langsmith
     #   openai
-pydantic-core==2.16.3
-    # via pydantic
+pydantic-core==2.18.2
+    # via
+    #   instructor
+    #   pydantic
 pydot==2.0.0
     # via pyformlang
 pyformlang==1.0.9
     # via guidance
 pygments==2.17.2
-    # via ipython
+    # via
+    #   ipython
+    #   rich
 pyparsing==3.1.2
     # via pydot
 pypdf==4.1.0
@@ -183,6 +216,7 @@ python-dateutil==2.9.0.post0
     # via jupyter-client
 pyyaml==6.0.1
     # via
+    #   huggingface-hub
     #   langchain
     #   langchain-community
     #   langchain-core
@@ -195,17 +229,25 @@ regex==2023.12.25
 requests==2.31.0
     # via
     #   guidance
+    #   huggingface-hub
     #   langchain
     #   langchain-community
     #   langchain-core
     #   langsmith
     #   tiktoken
+rich==13.7.1
+    # via
+    #   instructor
+    #   typer
+shellingham==1.5.4
+    # via typer
 six==1.16.0
     # via
     #   asttokens
     #   python-dateutil
 sniffio==1.3.1
     # via
+    #   anthropic
     #   anyio
     #   httpx
     #   openai
@@ -219,6 +261,7 @@ starlette==0.36.3
     # via fastapi
 tenacity==8.2.3
     # via
+    #   instructor
     #   langchain
     #   langchain-community
     #   langchain-core
@@ -226,12 +269,16 @@ tiktoken==0.6.0
     # via
     #   guidance
     #   langchain-openai
+tokenizers==0.19.1
+    # via anthropic
 tornado==6.4
     # via
     #   ipykernel
     #   jupyter-client
 tqdm==4.66.2
-    # via openai
+    # via
+    #   huggingface-hub
+    #   openai
 traitlets==5.14.2
     # via
     #   comm
@@ -240,14 +287,19 @@ traitlets==5.14.2
     #   jupyter-client
     #   jupyter-core
     #   matplotlib-inline
+typer==0.12.3
+    # via instructor
 typing-extensions==4.10.0
     # via
+    #   anthropic
     #   anyio
     #   fastapi
+    #   huggingface-hub
     #   openai
     #   pydantic
     #   pydantic-core
     #   sqlalchemy
+    #   typer
     #   typing-inspect
     #   uvicorn
 typing-inspect==0.9.0

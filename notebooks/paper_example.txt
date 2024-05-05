@@ -1,0 +1,1016 @@
+4
+Do Large Language Models Know What They Don’t Know?
+Zhangyue Yin♢Qiushi Sun♠Qipeng Guo♢
+Jiawen Wu♢Xipeng Qiu♢∗Xuanjing Huang♢
+♢School of Computer Science, Fudan University♠Department of Mathematics, National University of Singapore
+{yinzy21,jwwu21}@m.fudan.edu.cn qiushisun@u.nus.edu
+{qpguo16,xpqiu,xjhuang}@fudan.edu.cn
+Abstract
+Large language models (LLMs) have a wealth
+of knowledge that allows them to excel in vari-
+ous Natural Language Processing (NLP) tasks.
+Current research focuses on enhancing their
+performance within their existing knowledge.
+Despite their vast knowledge, LLMs are still
+limited by the amount of information they can
+accommodate and comprehend. Therefore, the
+ability to understand their own limitations on
+the unknows, referred to as self-knowledge,
+is of paramount importance. This study aims
+to evaluate LLMs’ self-knowledge by assess-
+ing their ability to identify unanswerable or
+unknowable questions. We introduce an auto-
+mated methodology to detect uncertainty in the
+responses of these models, providing a novel
+measure of their self-knowledge. We further in-
+troduce a unique dataset, SelfAware, consisting
+of unanswerable questions from five diverse cat-
+egories and their answerable counterparts. Our
+extensive analysis, involving 20 LLMs includ-
+ing GPT-3, InstructGPT, and LLaMA, discov-
+ering an intrinsic capacity for self-knowledge
+within these models. Moreover, we demon-
+strate that in-context learning and instruction
+tuning can further enhance this self-knowledge.
+Despite this promising insight, our findings also
+highlight a considerable gap between the capa-
+bilities of these models and human proficiency
+in recognizing the limits of their knowledge.
+“True wisdom is knowing what you don’t know.”
+–Confucius
+1 Introduction
+Recently, Large Language Models (LLMs) such
+as GPT-4 (OpenAI, 2023), PaLM 2 (Anil et al.,
+2023), and LLaMA (Touvron et al., 2023) have
+shown exceptional performance on a wide range
+of NLP tasks, including common sense reason-
+ing (Wei et al., 2022; Zhou et al., 2022) and mathe-
+∗Corresponding author.UnknowsKnowsUnknowsKnowsKnown Knows Known UnknowsUnknown UnknowsUnknown KnowsUnlock
+Figure 1: Know-Unknow Quadrant. The horizontal axis
+represents the model’s memory capacity for knowledge,
+and the vertical axis represents the model’s ability to
+comprehend and utilize knowledge.
+matical problem-solving (Lewkowycz et al., 2022;
+Chen et al., 2022). Despite their ability to learn
+from huge amounts of data, LLMs still have lim-
+itations in their capacity to retain and understand
+information. To ensure responsible usage, it is cru-
+cial for LLMs to have the capability of recognizing
+their limitations and conveying uncertainty when
+responding to unanswerable or unknowable ques-
+tions. This acknowledgment of limitations, also
+known as “knowing what you don’t know,” is a
+crucial aspect in determining their practical appli-
+cability. In this work, we refer to this ability as
+model self-knowledge.
+The Know-Unknow quadrant in Figure 1 il-
+lustrates the relationship between the model’s
+knowledge and comprehension. The ratio of
+“Known Knows” to “Unknown Knows” demon-
+strates the model’s proficiency in understanding
+and applying existing knowledge. Techniques
+such as Chain-of-Thought (Wei et al., 2022), Self-
+Consistency (Wang et al., 2022), and Complex
+CoT (Fu et al., 2022) can be utilized to increase
+arXiv:2305.18153v2  [cs.CL]  30 May 2023
+this ratio, resulting in improved performance on
+NLP tasks. We focus on the ratio of “Known Un-
+knows” to “Unknown Unknows”, which indicates
+the model’s self-knowledge level, specifically un-
+derstanding its own limitations and deficiencies in
+the unknows.
+Existing datasets such as SQuAD2.0 (Rajpurkar
+et al., 2018) and NewsQA (Trischler et al., 2017),
+widely used in question answering (QA), have been
+utilized to test the self-knowledge of models with
+unanswerable questions. However, these questions
+are context-specific and could become answerable
+when supplemented with additional information.
+Srivastava et al. (2022) attempted to address this by
+evaluating LLMs’ competence in delineating their
+knowledge boundaries, employing a set of 23 pairs
+of answerable and unanswerable multiple-choice
+questions. They discovered that these models’ per-
+formance barely surpassed that of random guessing.
+Kadavath et al. (2022) suggested probing the self-
+knowledge of LLMs through the implementation
+of a distinct "Value Head". Yet, this approach may
+encounter difficulties when applied across varied
+domains or tasks due to task-specific training. Con-
+sequently, we redirect our focus to the inherent
+abilities of LLMs, and pose the pivotal question:
+“Do large language models know what they don’t
+know?”.
+In this study, we investigate the self-knowledge
+of LLMs using a novel approach. By gathering
+reference sentences with uncertain meanings, we
+can determine whether the model’s responses re-
+flect uncertainty using a text similarity algorithm.
+We quantified the model’s self-knowledge using
+the F1 score. To address the small and idiosyn-
+cratic limitations of existing datasets, we created
+a new dataset called SelfAware. This dataset com-
+prises 1,032 unanswerable questions, which are dis-
+tributed across five distinct categories, along with
+an additional 2,337 questions that are classified as
+answerable. Experimental results on GPT-3, In-
+structGPT, LLaMA, and other LLMs demonstrate
+that in-context learning and instruction tuning can
+effectively enhance the self-knowledge of LLMs.
+However, the self-knowledge exhibited by the cur-
+rent state-of-the-art model, GPT-4, measures at
+75.47%, signifying a notable disparity when con-
+trasted with human self-knowledge, which is rated
+at 84.93%.
+Our key contributions to this field are summa-
+rized as follows:
+• We have developed a new dataset, SelfAware,
+that comprises a diverse range of commonly
+posed unanswerable questions.
+• We propose an innovative evaluation tech-
+nique based on text similarity to quantify the
+degree of uncertainty inherent in model out-
+puts.
+• Through our detailed analysis of 20 LLMs,
+benchmarked against human self-knowledge,
+we identified a significant disparity between
+the most advanced LLMs and humans 1.
+2 Dataset Construction
+To conduct a more comprehensive evaluation of
+the model’s self-knowledge, we constructed a
+dataset that includes a larger number and more di-
+verse types of unanswerable questions than Know-
+Unknowns dataset (Srivastava et al., 2022). To
+facilitate this, we collected a corpus of 2,858 unan-
+swerable questions, sourced from online platforms
+like Quora and HowStuffWorks. These questions
+were meticulously evaluated by three seasoned an-
+notation analysts, each operating independently.
+The analysts were permitted to leverage external
+resources, such as search engines. To ensure the va-
+lidity of our dataset, we retained only the questions
+that all three analysts concurred were unanswerable.
+This rigorous process yielded a finalized collection
+of 1,032 unanswerable questions.
+In pursuit of a comprehensive evaluation, we
+opted for answerable questions drawn from three
+datasets: SQuAD (Rajpurkar et al., 2016), Hot-
+potQA (Yang et al., 2018), and TriviaQA (Joshi
+et al., 2017). Our selection was guided by Sim-
+CSE (Gao et al., 2021), which allowed us to iden-
+tify and select the answerable questions semanti-
+cally closest to the unanswerable ones. From these
+sources, we accordingly drew samples of 1,487,
+182, and 668 questions respectively, amassing a
+total of 2,337. Given that these questions can be
+effectively addressed using information available
+on Wikipedia, the foundational corpus for the train-
+ing of current LLMs, it is plausible to infer that
+the model possesses the requisite knowledge to
+generate accurate responses to these questions.
+Our dataset, christened SelfAware, incorporates
+1,032 unanswerable and 2,337 answerable ques-
+tions. To reflect real-world distribution, our dataset
+1The code pertinent to our study can be accessed
+https://github.com/yinzhangyue/SelfAware
+Category Description Example Percentage
+No scientific
+consensus
+The answer is still up
+for debate, with no consensus
+in scientific community.
+“Are we alone in the universe,
+or will we discover alien
+life at some point?”
+25%
+Imagination The question are about people’s
+imaginations of the future.
+"What will the fastest form of
+transportation be in 2050?" 15%
+Completely
+subjective
+The answer depends on
+personal preference.
+"Would you rather be shot
+into space or explore the
+deepest depths of the sea?"
+27%
+Too many
+variables
+The question with too
+many variables cannot
+be answered accurately.
+“John made 6 dollars mowing lawns
+and 18 dollars weed eating.
+If he only spent 3 or 5 dollar a week,
+how long would the money last him?”
+10%
+Philosophical
+The question can yield
+multiple responses, but it
+lacks a definitive answer.
+“How come god was
+born from nothingness?” 23%
+Table 1: Unanswerable questions in the SelfAware dataset that span across multiple categories.
+contains a proportion of answerable questions that
+is twice as large as the volume of unanswerable
+ones. Nevertheless, to ensure the feasibility of test-
+ing, we have purposefully capped the number of
+answerable questions.
+2.1 Dataset Analysis
+To gain insight into the reasons precluding a cer-
+tain answer, we undertook a manual analysis of
+100 randomly selected unanswerable questions. As
+tabulated in Table 1, we have broadly segregated
+these questions into five distinctive categories. “No
+Scientific Consensus" encapsulates questions that
+ignite ongoing debates within the scientific com-
+munity, such as those concerning the universe’s
+origin. “Imagination" includes questions involving
+speculative future scenarios, like envisaged events
+over the next 50 years. “Completely Subjective"
+comprises questions that are inherently personal,
+where answers depend heavily on individual predis-
+positions. “Too Many Variables" pertains to mathe-
+matical problems that become unsolvable owing to
+the overwhelming prevalence of variables. Lastly,
+“Philosophical" represents questions of a profound,
+often metaphysical, nature that resist concrete an-
+swers. Ideally, upon encountering such questions,
+the model should express uncertainty instead of
+delivering conclusive responses.
+3 Evaluation Method
+This section elucidates the methodology employed
+for assessing self-knowledge in the generated text.
+In order to achieve this, we define a similarity func-
+tion, fsim, to compute the similarity, S, between
+a given sentence, t, and a collection of reference
+sentences, U ={u1, u2, . . . , un}, endowed with
+uncertain meanings.
+Si =fsim(t, ui). (1)
+Whenever any Si surpasses a pre-determined
+threshold T, we perceive the text t as encompass-
+ing uncertain meanings, thereby eliminating the
+need for manual evaluation of the response.
+Given the substantial disparity in the volume of
+answerable and unanswerable questions in Self-
+Aware, we adopt the F1 score as a measure of
+LLMs’ self-knowledge. Our focus rests on identi-
+fying unanswerable questions, hence we designate
+them as positive cases and categorize answerable
+questions as negative cases.
+4 Experiment
+4.1 Model
+We conduct a sequence of experiments to evaluate
+the degree of self-knowledge manifested by various
+LLMs, including GPT-3 (Brown et al., 2020) and
+InstructGPT (Ouyang et al., 2022) series, as well
+as the recent LLaMA (Touvron et al., 2023) and
+its derivative models, namely Alpaca (Taori et al.,
+2023) and Vicuna (Chiang et al., 2023). Our in-
+vestigative approach employed three distinct input
+forms: Direct, Instruction, and In-Context Learn-
+ing (ICL), which is encapsulated in Appendix A.4.
+350M
+1.3B
+6.7B
+175B20
+30
+40
+50
+60
+70
+F1 Scores
+22.38
+40.11
+26.96
+40.33
+26.17
+43.47
+27.54
+44.87
+Direct
+350M
+1.3B
+6.7B
+175B20
+30
+40
+50
+60
+70
+F1 Scores
+30.42
+42.31
+30.17
+45.91
+33.33
+48.79
+45.67
+49.61
+Instruction
+350M
+1.3B
+6.7B
+175B20
+30
+40
+50
+60
+70
+F1 Scores
+34.27
+47.93
+36.27
+48.42 47.24
+55.81 55.5
+65.12
+In-Context Learning
+GPT-3
+InstructGPT
+ModelFigure 2: Experimental results using three different input forms on a series of models from GPT-3(ada, babbage,
+curie, and davinci) and InstructGPT(text-ada-001, text-babbage-001, text-curie-001, and text-davinci-001)0 10 20 30 40 50 60 70 80
+F1 Scores
+davinci
+text-davinci-001
+text-davinci-002
+text-davinci-003
+gpt-3.5-turbo-0301
+gpt-4-0314
+Human
+Models
+45.67
+49.61
+47.48
+51.43
+54.12
+75.47
+84.93
+Figure 3: Comparison between the davinci series and
+human self-knowledge in instruction input form.
+4.2 Setting
+We devised the reference sentence set U through
+a process that combined automated generation by
+LLMs and manual filtering, detailed further in Ap-
+pendix A.1. To quantify the similarity between
+target and reference sentences, we utilized Sim-
+CSE (Gao et al., 2021), setting the similarity thresh-
+old to 0.75 during our experiments. An exploration
+of threshold ablation is available in Appendix A.2.
+To counteract potential errors in similarity calcula-
+tion induced by varying lengths of the target and
+reference sentences, we employed a sliding win-
+dow of length 5 to parse the target sentence into
+semantic chunks. During the generation process,
+we set the temperature to 0.7. We selected a ran-
+dom sample of 100 instances for GPT-4, while the
+remainder of the models were scrutinized using the
+full SelfAware dataset.
+4.3 Human Self-Knowledge
+To establish a benchmark for human self-
+knowledge, we engaged two volunteers and se-
+lected 100 random samples from the SelfAware
+dataset. The volunteers has 30 minutes to makedavinci
+text-davinci-001
+text-davinci-002
+text-davinci-003
+gpt-3.5-turbo-0301
+Models
+0
+10
+20
+30
+40
+50
+60
+F1 Scores
+55.5
+65.12 66.46 66.28
+60.86
+Figure 4: Experimental comparison of davinci series in
+ICL input form.
+judgments on the same set of questions, yielding
+an average F1 score of 84.93%, which we sub-
+sequently adopted as the benchmark for human
+self-knowledge. Detailed scores are available in
+Appendix A.3.
+4.4 Analysis
+We evaluate the manifestation of LLMs’ self-
+knowledge, centering our investigation on three
+fundamental dimensions: the size of the model,
+the impact of instruction tuning, and the influence
+exerted by different input forms.
+Model Size. Figure 2 illustrates the correlation
+between model size and self-knowledge across var-
+ious LLMs. It is noteworthy that across all three
+input forms, an augmentation in model parameter
+size is associated with an elevation in the F1 Score,
+with the most conspicuous enhancement manifest-
+ing in the ICL input form. Therefore, our analysis
+indicates that an LLM’s self-knowledge tends to
+enhance with increasing model size, a trend consis-
+tent with the scaling law.
+LLaMA-7B
+Alpaca-7B
+Vicuna-7B
+LLaMA-13B
+Alpaca-13B
+Vicuna-13B
+LLaMA-30B
+LLaMA-65B
+Models
+0
+10
+20
+30
+40
+50
+F1 Scores
+28.57
+35.87
+42.78
+30.12
+37.44
+47.84
+30.3
+46.89Figure 5: Experimental results obtained from LLaMA
+and its derived models, Alpaca and Vicuna in instruction
+input form.
+Instruction Tuning. Figure 2 delineates that
+models from the InstructGPT series exhibit a su-
+perior level of self-knowledge compared to their
+GPT-3 counterparts. Further evidence of model
+enhancement is provided by Figure 4, where text-
+davinci models show significant improvement rela-
+tive to the base davinci model. An additional com-
+parative analysis, presented in Figure 5, evaluates
+LLaMA against its derivative models. The results
+underscore a notable increase in self-knowledge
+for Alpaca and Vicuna upon instruction tuning, ex-
+ceeding their base model performances. Among
+these, Vicuna-13B outperforms the LLaMA-65B,
+corroborating the efficacy of instruction tuning for
+enhancing model self-knowledge.
+Input Forms. As shown in Figure 2, the incorpo-
+ration of instructions and examples serves to boost
+the self-knowledge of both the GPT-3 and Instruct-
+GPT series. Specifically, ICL input form, providing
+richer contextual information, contributes to a sig-
+nificant enhancement in models’ self-knowledge.
+This impact is particularly noticeable in the davinci
+model, where ICL facilitates a 27.96% improve-
+ment over the direct. Moreover, a comparison be-
+tween Figure 3 and Figure 4 reveals that the in-
+clusion of instructions and examples successfully
+minimizes the performance disparity between the
+davinci and text-davinci models, suggesting an ac-
+quisition of self-knowledge from the instructions
+and provided examples.
+Compared with Human. Figure 3 reveals that,
+without supplementary samples, GPT-4 currently
+performs best among the tested models, achieving
+an impressive F1 score of 75.47%. However, a no-
+ticeable gap becomes evident when comparing thistext-ada-001
+text-babbage-001
+text-curie-001
+text-davinci-001
+text-davinci-002
+text-davinci-003
+gpt-3.5-turbo-0301
+gpt-4-0314
+Models
+0
+5
+10
+15
+20
+25
+30
+35
+40
+Accuracy
+2.48
+4.45 4.7
+10.61
+15.7
+30.25
+38.29
+42.64
+Figure 6: Accuracy of the InstructGPT series when
+responding to answerable questions in instruction input
+form.
+performance to the human benchmark of 84.93%.
+This underscores the considerable potential that re-
+mains for enhancing the self-knowledge level of
+LLMs.
+Answerable Questions. Figure 6 traces the per-
+formance evolution of the InstructGPT series in
+addressing answerable questions, adhering to the
+closed-book question answering paradigm (Tou-
+vron et al., 2023), where output accuracy is con-
+tingent on the presence of the correct answer. Our
+observations underscore a steady enhancement in
+QA task accuracy corresponding to an increase
+in model parameter size and continuous learning.
+Particularly, the accuracy of text-davinci-001 expe-
+riences a significant ascent, scaling from a meager
+2.48% in text-ada-001 to 10.61%, whereas GPT-4
+marks an even more striking jump to 42.64%.
+5 Conclusion
+This study investigates the self-knowledge of
+LLMs by evaluating their ability to identify unan-
+swerable questions. Through the introduction of a
+novel dataset and an automated method for detect-
+ing uncertainty in the models’ responses, we are
+able to accurately measure the self-knowledge of
+LLMs such as GPT-3, InstructGPT and LLaMA.
+Our results reveal that while these models possess
+a certain degree of self-knowledge, there is still
+an apparent disparity in comparison to human self-
+knowledge. This highlights the need for further
+research in this area to enhance the ability of LLMs
+to understand their own limitations on the unknows.
+Such efforts will lead to more accurate and reliable
+responses from LLMs, which will have a positive
+impact on their applications in diverse fields.
+""")
+def evaluate_with_gpt4(prompt_question, summary_output):
+    response = client.chat.completions.create(
+        model="gpt-4-turbo",
+        messages=[{"role": "system", "content": """You are a evaluation engine for summaries.
+                   You will be fed the prompt and the summary output and you will evaluate 
+                   the output based on the following criteria:
+                   1. Relevance : Evaluates if the summary includes only important information and excludes redundancies.
+                   2. Coherence : Assesses the logical flow and organization of the summary.
+                   3. Consistency : Checks if the summary aligns with the facts in the source document.
+                   4. Fluency : Rates the grammar and readability of the summary. Your output should ONLY be a single
+                   integer representing the score from 1-10 averaging over the above criteria and nothing else.
+                   """},
+                  {"role": "user", "content": f"Evaluate this summary: {summary_output} based on the following prompt: {prompt_question}. Output score:"}]
+    )
+    
+    return response.choices[0].message.content
+
+
+prompt_summary = """
+4
+Do Large Language Models Know What They Don’t Know?
+Zhangyue Yin♢Qiushi Sun♠Qipeng Guo♢
+Jiawen Wu♢Xipeng Qiu♢∗Xuanjing Huang♢
+♢School of Computer Science, Fudan University♠Department of Mathematics, National University of Singapore
+{yinzy21,jwwu21}@m.fudan.edu.cn qiushisun@u.nus.edu
+{qpguo16,xpqiu,xjhuang}@fudan.edu.cn
+Abstract
+Large language models (LLMs) have a wealth
+of knowledge that allows them to excel in vari-
+ous Natural Language Processing (NLP) tasks.
+Current research focuses on enhancing their
+performance within their existing knowledge.
+Despite their vast knowledge, LLMs are still
+limited by the amount of information they can
+accommodate and comprehend. Therefore, the
+ability to understand their own limitations on
+the unknows, referred to as self-knowledge,
+is of paramount importance. This study aims
+to evaluate LLMs’ self-knowledge by assess-
+ing their ability to identify unanswerable or
+unknowable questions. We introduce an auto-
+mated methodology to detect uncertainty in the
+responses of these models, providing a novel
+measure of their self-knowledge. We further in-
+troduce a unique dataset, SelfAware, consisting
+of unanswerable questions from five diverse cat-
+egories and their answerable counterparts. Our
+extensive analysis, involving 20 LLMs includ-
+ing GPT-3, InstructGPT, and LLaMA, discov-
+ering an intrinsic capacity for self-knowledge
+within these models. Moreover, we demon-
+strate that in-context learning and instruction
+tuning can further enhance this self-knowledge.
+Despite this promising insight, our findings also
+highlight a considerable gap between the capa-
+bilities of these models and human proficiency
+in recognizing the limits of their knowledge.
+“True wisdom is knowing what you don’t know.”
+–Confucius
+1 Introduction
+Recently, Large Language Models (LLMs) such
+as GPT-4 (OpenAI, 2023), PaLM 2 (Anil et al.,
+2023), and LLaMA (Touvron et al., 2023) have
+shown exceptional performance on a wide range
+of NLP tasks, including common sense reason-
+ing (Wei et al., 2022; Zhou et al., 2022) and mathe-
+∗Corresponding author.UnknowsKnowsUnknowsKnowsKnown Knows Known UnknowsUnknown UnknowsUnknown KnowsUnlock
+Figure 1: Know-Unknow Quadrant. The horizontal axis
+represents the model’s memory capacity for knowledge,
+and the vertical axis represents the model’s ability to
+comprehend and utilize knowledge.
+matical problem-solving (Lewkowycz et al., 2022;
+Chen et al., 2022). Despite their ability to learn
+from huge amounts of data, LLMs still have lim-
+itations in their capacity to retain and understand
+information. To ensure responsible usage, it is cru-
+cial for LLMs to have the capability of recognizing
+their limitations and conveying uncertainty when
+responding to unanswerable or unknowable ques-
+tions. This acknowledgment of limitations, also
+known as “knowing what you don’t know,” is a
+crucial aspect in determining their practical appli-
+cability. In this work, we refer to this ability as
+model self-knowledge.
+The Know-Unknow quadrant in Figure 1 il-
+lustrates the relationship between the model’s
+knowledge and comprehension. The ratio of
+“Known Knows” to “Unknown Knows” demon-
+strates the model’s proficiency in understanding
+and applying existing knowledge. Techniques
+such as Chain-of-Thought (Wei et al., 2022), Self-
+Consistency (Wang et al., 2022), and Complex
+CoT (Fu et al., 2022) can be utilized to increase
+arXiv:2305.18153v2  [cs.CL]  30 May 2023
+this ratio, resulting in improved performance on
+NLP tasks. We focus on the ratio of “Known Un-
+knows” to “Unknown Unknows”, which indicates
+the model’s self-knowledge level, specifically un-
+derstanding its own limitations and deficiencies in
+the unknows.
+Existing datasets such as SQuAD2.0 (Rajpurkar
+et al., 2018) and NewsQA (Trischler et al., 2017),
+widely used in question answering (QA), have been
+utilized to test the self-knowledge of models with
+unanswerable questions. However, these questions
+are context-specific and could become answerable
+when supplemented with additional information.
+Srivastava et al. (2022) attempted to address this by
+evaluating LLMs’ competence in delineating their
+knowledge boundaries, employing a set of 23 pairs
+of answerable and unanswerable multiple-choice
+questions. They discovered that these models’ per-
+formance barely surpassed that of random guessing.
+Kadavath et al. (2022) suggested probing the self-
+knowledge of LLMs through the implementation
+of a distinct "Value Head". Yet, this approach may
+encounter difficulties when applied across varied
+domains or tasks due to task-specific training. Con-
+sequently, we redirect our focus to the inherent
+abilities of LLMs, and pose the pivotal question:
+“Do large language models know what they don’t
+know?”.
+In this study, we investigate the self-knowledge
+of LLMs using a novel approach. By gathering
+reference sentences with uncertain meanings, we
+can determine whether the model’s responses re-
+flect uncertainty using a text similarity algorithm.
+We quantified the model’s self-knowledge using
+the F1 score. To address the small and idiosyn-
+cratic limitations of existing datasets, we created
+a new dataset called SelfAware. This dataset com-
+prises 1,032 unanswerable questions, which are dis-
+tributed across five distinct categories, along with
+an additional 2,337 questions that are classified as
+answerable. Experimental results on GPT-3, In-
+structGPT, LLaMA, and other LLMs demonstrate
+that in-context learning and instruction tuning can
+effectively enhance the self-knowledge of LLMs.
+However, the self-knowledge exhibited by the cur-
+rent state-of-the-art model, GPT-4, measures at
+75.47%, signifying a notable disparity when con-
+trasted with human self-knowledge, which is rated
+at 84.93%.
+Our key contributions to this field are summa-
+rized as follows:
+• We have developed a new dataset, SelfAware,
+that comprises a diverse range of commonly
+posed unanswerable questions.
+• We propose an innovative evaluation tech-
+nique based on text similarity to quantify the
+degree of uncertainty inherent in model out-
+puts.
+• Through our detailed analysis of 20 LLMs,
+benchmarked against human self-knowledge,
+we identified a significant disparity between
+the most advanced LLMs and humans 1.
+2 Dataset Construction
+To conduct a more comprehensive evaluation of
+the model’s self-knowledge, we constructed a
+dataset that includes a larger number and more di-
+verse types of unanswerable questions than Know-
+Unknowns dataset (Srivastava et al., 2022). To
+facilitate this, we collected a corpus of 2,858 unan-
+swerable questions, sourced from online platforms
+like Quora and HowStuffWorks. These questions
+were meticulously evaluated by three seasoned an-
+notation analysts, each operating independently.
+The analysts were permitted to leverage external
+resources, such as search engines. To ensure the va-
+lidity of our dataset, we retained only the questions
+that all three analysts concurred were unanswerable.
+This rigorous process yielded a finalized collection
+of 1,032 unanswerable questions.
+In pursuit of a comprehensive evaluation, we
+opted for answerable questions drawn from three
+datasets: SQuAD (Rajpurkar et al., 2016), Hot-
+potQA (Yang et al., 2018), and TriviaQA (Joshi
+et al., 2017). Our selection was guided by Sim-
+CSE (Gao et al., 2021), which allowed us to iden-
+tify and select the answerable questions semanti-
+cally closest to the unanswerable ones. From these
+sources, we accordingly drew samples of 1,487,
+182, and 668 questions respectively, amassing a
+total of 2,337. Given that these questions can be
+effectively addressed using information available
+on Wikipedia, the foundational corpus for the train-
+ing of current LLMs, it is plausible to infer that
+the model possesses the requisite knowledge to
+generate accurate responses to these questions.
+Our dataset, christened SelfAware, incorporates
+1,032 unanswerable and 2,337 answerable ques-
+tions. To reflect real-world distribution, our dataset
+1The code pertinent to our study can be accessed
+https://github.com/yinzhangyue/SelfAware
+Category Description Example Percentage
+No scientific
+consensus
+The answer is still up
+for debate, with no consensus
+in scientific community.
+“Are we alone in the universe,
+or will we discover alien
+life at some point?”
+25%
+Imagination The question are about people’s
+imaginations of the future.
+"What will the fastest form of
+transportation be in 2050?" 15%
+Completely
+subjective
+The answer depends on
+personal preference.
+"Would you rather be shot
+into space or explore the
+deepest depths of the sea?"
+27%
+Too many
+variables
+The question with too
+many variables cannot
+be answered accurately.
+“John made 6 dollars mowing lawns
+and 18 dollars weed eating.
+If he only spent 3 or 5 dollar a week,
+how long would the money last him?”
+10%
+Philosophical
+The question can yield
+multiple responses, but it
+lacks a definitive answer.
+“How come god was
+born from nothingness?” 23%
+Table 1: Unanswerable questions in the SelfAware dataset that span across multiple categories.
+contains a proportion of answerable questions that
+is twice as large as the volume of unanswerable
+ones. Nevertheless, to ensure the feasibility of test-
+ing, we have purposefully capped the number of
+answerable questions.
+2.1 Dataset Analysis
+To gain insight into the reasons precluding a cer-
+tain answer, we undertook a manual analysis of
+100 randomly selected unanswerable questions. As
+tabulated in Table 1, we have broadly segregated
+these questions into five distinctive categories. “No
+Scientific Consensus" encapsulates questions that
+ignite ongoing debates within the scientific com-
+munity, such as those concerning the universe’s
+origin. “Imagination" includes questions involving
+speculative future scenarios, like envisaged events
+over the next 50 years. “Completely Subjective"
+comprises questions that are inherently personal,
+where answers depend heavily on individual predis-
+positions. “Too Many Variables" pertains to mathe-
+matical problems that become unsolvable owing to
+the overwhelming prevalence of variables. Lastly,
+“Philosophical" represents questions of a profound,
+often metaphysical, nature that resist concrete an-
+swers. Ideally, upon encountering such questions,
+the model should express uncertainty instead of
+delivering conclusive responses.
+3 Evaluation Method
+This section elucidates the methodology employed
+for assessing self-knowledge in the generated text.
+In order to achieve this, we define a similarity func-
+tion, fsim, to compute the similarity, S, between
+a given sentence, t, and a collection of reference
+sentences, U ={u1, u2, . . . , un}, endowed with
+uncertain meanings.
+Si =fsim(t, ui). (1)
+Whenever any Si surpasses a pre-determined
+threshold T, we perceive the text t as encompass-
+ing uncertain meanings, thereby eliminating the
+need for manual evaluation of the response.
+Given the substantial disparity in the volume of
+answerable and unanswerable questions in Self-
+Aware, we adopt the F1 score as a measure of
+LLMs’ self-knowledge. Our focus rests on identi-
+fying unanswerable questions, hence we designate
+them as positive cases and categorize answerable
+questions as negative cases.
+4 Experiment
+4.1 Model
+We conduct a sequence of experiments to evaluate
+the degree of self-knowledge manifested by various
+LLMs, including GPT-3 (Brown et al., 2020) and
+InstructGPT (Ouyang et al., 2022) series, as well
+as the recent LLaMA (Touvron et al., 2023) and
+its derivative models, namely Alpaca (Taori et al.,
+2023) and Vicuna (Chiang et al., 2023). Our in-
+vestigative approach employed three distinct input
+forms: Direct, Instruction, and In-Context Learn-
+ing (ICL), which is encapsulated in Appendix A.4.
+
+Figure 3: Comparison between the davinci series and
+human self-knowledge in instruction input form.
+4.2 Setting
+We devised the reference sentence set U through
+a process that combined automated generation by
+LLMs and manual filtering, detailed further in Ap-
+pendix A.1. To quantify the similarity between
+target and reference sentences, we utilized Sim-
+CSE (Gao et al., 2021), setting the similarity thresh-
+old to 0.75 during our experiments. An exploration
+of threshold ablation is available in Appendix A.2.
+To counteract potential errors in similarity calcula-
+tion induced by varying lengths of the target and
+reference sentences, we employed a sliding win-
+dow of length 5 to parse the target sentence into
+semantic chunks. During the generation process,
+we set the temperature to 0.7. We selected a ran-
+dom sample of 100 instances for GPT-4, while the
+remainder of the models were scrutinized using the
+full SelfAware dataset.
+4.3 Human Self-Knowledge
+To establish a benchmark for human self-
+knowledge, we engaged two volunteers and se-
+lected 100 random samples from the SelfAware
+dataset. The volunteers has 30 minutes to makedavinci
+text-davinci-001
+text-davinci-002
+text-davinci-003
+gpt-3.5-turbo-0301
+Models
+0
+10
+20
+30
+40
+50
+60
+F1 Scores
+55.5
+65.12 66.46 66.28
+60.86
+Figure 4: Experimental comparison of davinci series in
+ICL input form.
+judgments on the same set of questions, yielding
+an average F1 score of 84.93%, which we sub-
+sequently adopted as the benchmark for human
+self-knowledge. Detailed scores are available in
+Appendix A.3.
+4.4 Analysis
+We evaluate the manifestation of LLMs’ self-
+knowledge, centering our investigation on three
+fundamental dimensions: the size of the model,
+the impact of instruction tuning, and the influence
+exerted by different input forms.
+Model Size. Figure 2 illustrates the correlation
+between model size and self-knowledge across var-
+ious LLMs. It is noteworthy that across all three
+input forms, an augmentation in model parameter
+size is associated with an elevation in the F1 Score,
+with the most conspicuous enhancement manifest-
+ing in the ICL input form. Therefore, our analysis
+indicates that an LLM’s self-knowledge tends to
+enhance with increasing model size, a trend consis-
+tent with the scaling law.
+LLaMA-7B
+Alpaca-7B
+Vicuna-7B
+LLaMA-13B
+Alpaca-13B
+Vicuna-13B
+LLaMA-30B
+LLaMA-65B
+Models
+0
+10
+20
+30
+40
+50
+F1 Scores
+28.57
+35.87
+42.78
+30.12
+37.44
+47.84
+30.3
+46.89Figure 5: Experimental results obtained from LLaMA
+and its derived models, Alpaca and Vicuna in instruction
+input form.
+Instruction Tuning. Figure 2 delineates that
+models from the InstructGPT series exhibit a su-
+perior level of self-knowledge compared to their
+GPT-3 counterparts. Further evidence of model
+enhancement is provided by Figure 4, where text-
+davinci models show significant improvement rela-
+tive to the base davinci model. An additional com-
+parative analysis, presented in Figure 5, evaluates
+LLaMA against its derivative models. The results
+underscore a notable increase in self-knowledge
+for Alpaca and Vicuna upon instruction tuning, ex-
+ceeding their base model performances. Among
+these, Vicuna-13B outperforms the LLaMA-65B,
+corroborating the efficacy of instruction tuning for
+enhancing model self-knowledge.
+Input Forms. As shown in Figure 2, the incorpo-
+ration of instructions and examples serves to boost
+the self-knowledge of both the GPT-3 and Instruct-
+GPT series. Specifically, ICL input form, providing
+richer contextual information, contributes to a sig-
+nificant enhancement in models’ self-knowledge.
+This impact is particularly noticeable in the davinci
+model, where ICL facilitates a 27.96% improve-
+ment over the direct. Moreover, a comparison be-
+tween Figure 3 and Figure 4 reveals that the in-
+clusion of instructions and examples successfully
+minimizes the performance disparity between the
+davinci and text-davinci models, suggesting an ac-
+quisition of self-knowledge from the instructions
+and provided examples.
+Compared with Human. Figure 3 reveals that,
+without supplementary samples, GPT-4 currently
+performs best among the tested models, achieving
+an impressive F1 score of 75.47%. However, a no-
+ticeable gap becomes evident when comparing thistext-ada-001
+text-babbage-001
+text-curie-001
+text-davinci-001
+text-davinci-002
+text-davinci-003
+gpt-3.5-turbo-0301
+gpt-4-0314
+Models
+0
+5
+10
+15
+20
+25
+30
+35
+40
+Accuracy
+2.48
+4.45 4.7
+10.61
+15.7
+30.25
+38.29
+42.64
+Figure 6: Accuracy of the InstructGPT series when
+responding to answerable questions in instruction input
+form.
+performance to the human benchmark of 84.93%.
+This underscores the considerable potential that re-
+mains for enhancing the self-knowledge level of
+LLMs.
+Answerable Questions. Figure 6 traces the per-
+formance evolution of the InstructGPT series in
+addressing answerable questions, adhering to the
+closed-book question answering paradigm (Tou-
+vron et al., 2023), where output accuracy is con-
+tingent on the presence of the correct answer. Our
+observations underscore a steady enhancement in
+QA task accuracy corresponding to an increase
+in model parameter size and continuous learning.
+Particularly, the accuracy of text-davinci-001 expe-
+riences a significant ascent, scaling from a meager
+2.48% in text-ada-001 to 10.61%, whereas GPT-4
+marks an even more striking jump to 42.64%.
+5 Conclusion
+This study investigates the self-knowledge of
+LLMs by evaluating their ability to identify unan-
+swerable questions. Through the introduction of a
+novel dataset and an automated method for detect-
+ing uncertainty in the models’ responses, we are
+able to accurately measure the self-knowledge of
+LLMs such as GPT-3, InstructGPT and LLaMA.
+Our results reveal that while these models possess
+a certain degree of self-knowledge, there is still
+an apparent disparity in comparison to human self-
+knowledge. This highlights the need for further
+research in this area to enhance the ability of LLMs
+to understand their own limitations on the unknows.
+Such efforts will lead to more accurate and reliable
+responses from LLMs, which will have a positive
+impact on their applications in diverse fields.
